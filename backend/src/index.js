@@ -8,6 +8,8 @@ dotenv.config(); // Load environment variables from .env file
 const app = express();
 const PORT = process.env.PORT || 5001;
 
+app.use(express.json()); // Middleware to parse JSON bodies
+
 app.use("/api/auth", authRoutes);
 
 app.listen(PORT, () => {

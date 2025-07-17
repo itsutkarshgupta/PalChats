@@ -1,6 +1,7 @@
 import { generateToken } from "../lib/utils.js";
 import User from "../models/user.model.js";
 import bcrypt from "bcryptjs";
+import validator from "validator";
 
 export const login = (req, res) => {
   res.send("Login route");
@@ -10,6 +11,17 @@ export const signup = async (req, res) => {
   const { email, username, password } = req.body;
   try {
     // Validate if the password is at least 6 characters long
+    if (!email || !username || !password) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+    if (username.length < 3 || username.length > 30) {
+      return res
+        .status(400)
+        .json({ message: "Username must be between 3 and 30 characters long" });
+    }
+    if (!validator.isEmail(email)) {
+      return res.status(400).json({ message: "Invalid email format" });
+    }
     if (password.length < 6) {
       return res
         .status(400)
@@ -18,9 +30,10 @@ export const signup = async (req, res) => {
     // Check if the user already exists
     const user = await User.findOne({ email });
     if (user) {
-      return res
-        .status(400)
-        .json({ message: "User already exists witht this email" });
+      return res.status(400).json({
+        message:
+          "This Email address is already associated with an existing account. Please try logging in instead.",
+      });
     }
 
     //hash the password
